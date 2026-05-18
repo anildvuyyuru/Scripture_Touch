@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ScriptureProjection.ScriptureWindow"
+        Background="Black"
+        CanResize="False"
+        WindowState="Maximized"
+        SystemDecorations="None"
+        Topmost="True">
+    
+    <Grid>
+        <!-- Background image -->
+        <Image x:Name="BgImage" Stretch="UniformToFill"/>
+
+        <!-- Dim overlay -->
+        <Border Background="#70000000"/>
+
+        <!-- Verse content -->
+        <Grid Margin="94">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+			
+				<!-- Verse text -->
+			<TextBlock Grid.Row="0"
+                       x:Name="VerseText"
+                       VerticalAlignment="Center"
+                       TextAlignment="Center"
+                       Margin="0,20,0,0"
+                       Foreground="White"
+                       FontWeight="SemiBold"
+                       TextWrapping="Wrap"
+                       TextTrimming="WordEllipsis">
+
+			</TextBlock>
+			
+            
+
+            <!-- Reference and footer -->
+            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
+                <TextBlock x:Name="RefBlock"
+                           Foreground="#E6E6E6"
+                           FontSize="28"
+                           TextAlignment="Right" />
+
+                <TextBlock x:Name="InfoLeft"
+                           Foreground="#C8C8C8"
+                           FontSize="24"
+                           HorizontalAlignment="Left"
+                           IsVisible="True" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

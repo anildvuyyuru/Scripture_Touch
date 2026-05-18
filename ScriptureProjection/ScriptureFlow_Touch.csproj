@@ -1,0 +1,66 @@
+﻿<!-- ScriptureProjection.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>WinExe</OutputType>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<PublishSingleFile>true</PublishSingleFile>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<SelfContained>true</SelfContained>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<PublishTrimmed>false</PublishTrimmed>
+	</PropertyGroup>
+	<ItemGroup>
+	  <AvaloniaXaml Remove=".vs\**" />
+	  <AvaloniaXaml Remove="bin\**" />
+	  <AvaloniaXaml Remove="obj\**" />
+	  <Compile Remove=".vs\**" />
+	  <Compile Remove="bin\**" />
+	  <Compile Remove="obj\**" />
+	  <EmbeddedResource Remove=".vs\**" />
+	  <EmbeddedResource Remove="bin\**" />
+	  <EmbeddedResource Remove="obj\**" />
+	  <None Remove=".vs\**" />
+	  <None Remove="bin\**" />
+	  <None Remove="obj\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="MultiplyConverter.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.8" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+		<PackageReference Include="SourceGeneration.Reflection.SystemTextJson" Version="1.0.0-beta2.250415.0" />
+		<PackageReference Include="System.Device.Gpio" Version="4.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="ScriptureWindow.axaml.cs">
+	    <DependentUpon>ScriptureWindow.axaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Backgrounds\Encouragement\Encouragement.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Backgrounds\Promises\Promises.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Backgrounds\Proverbs\Proverbs.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Backgrounds\Psalms\Psalms.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Scripture.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+</Project>
