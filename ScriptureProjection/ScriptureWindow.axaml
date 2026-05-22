@@ -5,9 +5,11 @@
         CanResize="False"
         WindowState="Maximized"
         SystemDecorations="None"
-        Topmost="True">
-    
-    <Grid>
+        Topmost="True"
+		PointerPressed="OnScreenTapped">
+
+	<Grid>		
+		
         <!-- Background image -->
         <Image x:Name="BgImage" Stretch="UniformToFill"/>
 
@@ -50,6 +52,67 @@
                            HorizontalAlignment="Left"
                            IsVisible="True" />
             </StackPanel>
-        </Grid>
+
+			<Border x:Name="BottomPopup"
+        CornerRadius="40"
+        Padding="0"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Bottom"
+        Margin="0,0,0,40"
+        Opacity="0"
+        IsVisible="False">
+
+				<Grid>
+					<!-- Blurred background layer -->
+					<Border CornerRadius="40">
+						<Border.Effect>
+							<BlurEffect Radius="20"/>
+						</Border.Effect>
+
+						<Border.Background>
+							<!-- Solid tint + transparency -->
+							<SolidColorBrush Color="#101010" Opacity="0.4"/>
+						</Border.Background>
+					</Border>
+
+					<!-- Clear content layer -->
+					<StackPanel Orientation="Horizontal"
+								Spacing="50"
+								HorizontalAlignment="Center"
+								VerticalAlignment="Center"
+								Margin="25,20">
+
+						<!-- Previous -->
+						<Button PointerPressed="OnPrevClicked"
+								Background="Transparent"
+								BorderThickness="0"
+								Focusable ="false">
+							<TextBlock Text="⏮" FontSize="48" Foreground="White"/>
+						</Button>
+
+						<!-- Play / Pause -->
+						<Button PointerPressed="OnPlayPauseClicked"
+								Background="Transparent"
+								BorderThickness="0">
+							<TextBlock x:Name="PlayPauseIcon"
+									   Text="⏯"
+									   FontSize="48"
+									   Foreground="White"/>
+						</Button>
+
+						<!-- Next -->
+						<Button PointerPressed="OnNextClicked"
+								Background="Transparent"
+								BorderThickness="0">
+							<TextBlock Text="⏭" FontSize="48" Foreground="White"/>
+						</Button>
+
+					</StackPanel>
+				</Grid>
+			</Border>
+
+
+
+		</Grid>
     </Grid>
 </Window>

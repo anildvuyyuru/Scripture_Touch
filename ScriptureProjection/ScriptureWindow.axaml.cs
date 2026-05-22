@@ -1,7 +1,10 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Documents;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ScriptureProjection.Interfaces;
 using System.Device.Gpio;
@@ -15,6 +18,7 @@ public partial class ScriptureWindow : Window
     private IFileService? _fileService;
     private ITimerService? _timerService;
     private Entities.Scripture _data = new();
+    private bool _isPopupVisible = false;
 
     private readonly Dictionary<string, int> _pins = new()
     {
@@ -32,10 +36,10 @@ public partial class ScriptureWindow : Window
     private bool _isRunning = true;
     private string _group = "Promises";
     private readonly int[] _intervals = [5, 10, 20, 30, 60]; // seconds
-    private int _intervalIndex = 0;
+    private int _intervalIndex = 2;
     private int _verseIndex = 0;
 
-    // serialize operations so timer + buttons don�t overlap
+    // serialize operations so timer + buttons don’t overlap
     private readonly SemaphoreSlim _opLock = new(1, 1);
 
     public ScriptureWindow()
@@ -53,11 +57,33 @@ public partial class ScriptureWindow : Window
         OpenFullScreen();
 
         _ = LoadVerseDataAsync();
-        InitGpio();
+        //InitGpio();
         StartTimer();
         _ = UpdateBackgroundAsync();
         _ = UpdateVerseAsync();
     }
+
+
+    private async void OnScreenTapped(object? sender, PointerPressedEventArgs e)
+    {
+        if (!_isPopupVisible)
+        {
+            // Show popup
+            BottomPopup.IsVisible = true;
+            // Fade in
+            await AnimateOpacity(BottomPopup, 1, TimeSpan.FromMilliseconds(200));
+            _isPopupVisible = true;
+        }
+        else
+        {
+            // Fade out
+            await AnimateOpacity(BottomPopup, 0, TimeSpan.FromMilliseconds(200));
+            BottomPopup.IsVisible = false;
+            _isPopupVisible = false;
+        }
+
+    }
+
 
     private async Task RunSerialized(Func<Task> action)
     {
@@ -243,7 +269,7 @@ public partial class ScriptureWindow : Window
 
     private void ShutdownPi()
     {
-        InfoLeft.Text = "Shutting down�";
+        InfoLeft.Text = "Shutting down…";
         _timerService?.Stop();
         System.Diagnostics.Process.Start("bash", "-lc \"sudo shutdown -h now\"");
     }
@@ -308,8 +334,8 @@ public partial class ScriptureWindow : Window
 
         int verseLength = verseText.Length;
         int verseFontSize =
-            verseLength >= 400 ? 60 :
-            verseLength <= 100 ? 90 :
+            verseLength >= 400 ? 90 :
+            verseLength <= 100 ? 120 :
             75;
 
         VerseText.Inlines?.Clear();
@@ -375,4 +401,73 @@ public partial class ScriptureWindow : Window
             Console.WriteLine(ex);
         }
     }
+
+    // Simple UI-thread-safe fade helper to replace missing AnimateOpacity extension.
+    private async Task AnimateOpacity(Control control, double to, TimeSpan duration)
+    {
+        if (control == null)
+            return;
+
+        double from = control.Opacity;
+        if (Math.Abs(to - from) < 0.01)
+        {
+            // small difference — set directly
+            Dispatcher.UIThread.Post(() => control.Opacity = to);
+            return;
+        }
+
+        const int frameMs = 16;
+        int steps = Math.Max(1, (int)(duration.TotalMilliseconds / frameMs));
+        for (int i = 1; i <= steps; i++)
+        {
+            double t = (double)i / steps;
+            double value = from + (to - from) * t;
+            Dispatcher.UIThread.Post(() => control.Opacity = value);
+            await Task.Delay(frameMs);
+        }
+
+        Dispatcher.UIThread.Post(() => control.Opacity = to);
+    }
+
+    private async void OnPrevClicked(object? sender, PointerPressedEventArgs e)
+    {
+        if (_scriptureService == null)
+            return;
+
+        _verseIndex = await _scriptureService.GetPreviousVerseIndex(_data, _group, _verseIndex);
+        await UpdateVerseAsync();
+    }
+
+    private async void OnNextClicked(object? sender, PointerPressedEventArgs e)
+    {
+        if (_scriptureService == null)
+            return;
+
+        _verseIndex = await _scriptureService.GetNextVerseIndex(_data, _group, _verseIndex);
+        await UpdateVerseAsync();
+    }
+
+    private async void OnPlayPauseClicked(object? sender, PointerPressedEventArgs e)
+    {
+        if (_scriptureService == null)
+            return;
+
+        var interval = await _scriptureService.ToggleRun(_intervalIndex, _intervals, _isRunning);
+        _isRunning = !_isRunning;
+
+        if (_isRunning && interval != null)
+        {
+            _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
+            PlayPauseIcon.Text = "⏸"; // Pause icon
+        }
+        else
+        {
+            _timerService?.Stop();
+            PlayPauseIcon.Text = "▶"; // Play icon
+        }
+
+        await UpdateInfoAsync();
+    }
+
+
 }
