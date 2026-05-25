@@ -1,9 +1,13 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ScriptureProjection.Interfaces;
@@ -19,6 +23,8 @@ public partial class ScriptureWindow : Window
     private ITimerService? _timerService;
     private Entities.Scripture _data = new();
     private bool _isPopupVisible = false;
+    private Animation _showAnimation;
+    private Animation _hideAnimation;
 
     private readonly Dictionary<string, int> _pins = new()
     {
@@ -45,6 +51,7 @@ public partial class ScriptureWindow : Window
     public ScriptureWindow()
     {
         InitializeComponent();
+        //InitializeAnimations();
     }
 
     public void Initialize(IServiceProvider serviceProvider)
@@ -63,21 +70,77 @@ public partial class ScriptureWindow : Window
         _ = UpdateVerseAsync();
     }
 
+    private void InitializeAnimations()
+    {
+        _showAnimation = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(250),
+            Easing = new CubicEaseOut(),
+            Children =
+        {
+            new KeyFrame
+            {
+                Cue = new Cue(0),
+                Setters =
+                {
+                    new Setter(Visual.OpacityProperty, 0.0),
+                    new Setter(TranslateTransform.YProperty, 80.0)
+                }
+            },
+            new KeyFrame
+            {
+                Cue = new Cue(1),
+                Setters =
+                {
+                    new Setter(Visual.OpacityProperty, 1.0),
+                    new Setter(TranslateTransform.YProperty, 0.0)
+                }
+            }
+        }
+        };
 
-    private async void OnScreenTapped(object? sender, PointerPressedEventArgs e)
+        _hideAnimation = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(200),
+            Easing = new CubicEaseIn(),
+            Children =
+        {
+            new KeyFrame
+            {
+                Cue = new Cue(0),
+                Setters =
+                {
+                    new Setter(Visual.OpacityProperty, 1.0),
+                    new Setter(TranslateTransform.YProperty, 0.0)
+                }
+            },
+            new KeyFrame
+            {
+                Cue = new Cue(1),
+                Setters =
+                {
+                    new Setter(Visual.OpacityProperty, 0.0),
+                    new Setter(TranslateTransform.YProperty, 80.0)
+                }
+            }
+        }
+        };
+    }
+
+    private async void OnScreenTapped(object? sender, RoutedEventArgs e)
     {
         if (!_isPopupVisible)
         {
-            // Show popup
+            // Prepare and show popup           
             BottomPopup.IsVisible = true;
-            // Fade in
-            await AnimateOpacity(BottomPopup, 1, TimeSpan.FromMilliseconds(200));
+            // Fade in using existing helper
+            await AnimateOpacity(BottomPopup, 1, TimeSpan.FromMilliseconds(200));            
             _isPopupVisible = true;
         }
         else
         {
             // Fade out
-            await AnimateOpacity(BottomPopup, 0, TimeSpan.FromMilliseconds(200));
+            await AnimateOpacity(BottomPopup, 0, TimeSpan.FromMilliseconds(200));           
             BottomPopup.IsVisible = false;
             _isPopupVisible = false;
         }
@@ -429,7 +492,7 @@ public partial class ScriptureWindow : Window
         Dispatcher.UIThread.Post(() => control.Opacity = to);
     }
 
-    private async void OnPrevClicked(object? sender, PointerPressedEventArgs e)
+    private async void OnPrevClicked(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
             return;
@@ -438,7 +501,7 @@ public partial class ScriptureWindow : Window
         await UpdateVerseAsync();
     }
 
-    private async void OnNextClicked(object? sender, PointerPressedEventArgs e)
+    private async void OnNextClicked(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
             return;
@@ -447,7 +510,7 @@ public partial class ScriptureWindow : Window
         await UpdateVerseAsync();
     }
 
-    private async void OnPlayPauseClicked(object? sender, PointerPressedEventArgs e)
+    private async void OnPlayPauseClicked(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
             return;

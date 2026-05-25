@@ -54,62 +54,63 @@
             </StackPanel>
 
 			<Border x:Name="BottomPopup"
-        CornerRadius="40"
-        Padding="0"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Bottom"
-        Margin="0,0,0,40"
-        Opacity="0"
-        IsVisible="False">
-
+					CornerRadius="40"
+					Padding="0"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Bottom"
+					Margin="0,0,0,40"
+					Opacity="0"
+					IsVisible="False">
 				<Grid>
-					<!-- Blurred background layer -->
-					<Border CornerRadius="40">
+
+					<!-- Blurred + tinted background -->
+					<Border CornerRadius="40"
+							IsHitTestVisible="False">
 						<Border.Effect>
 							<BlurEffect Radius="20"/>
 						</Border.Effect>
-
 						<Border.Background>
-							<!-- Solid tint + transparency -->
-							<SolidColorBrush Color="#101010" Opacity="0.4"/>
+							<SolidColorBrush Color="#101010" Opacity="0.75"/>
 						</Border.Background>
 					</Border>
 
-					<!-- Clear content layer -->
+					<!-- Interactive content -->
 					<StackPanel Orientation="Horizontal"
 								Spacing="50"
+								Margin="25,20"
 								HorizontalAlignment="Center"
 								VerticalAlignment="Center"
-								Margin="25,20">
+								IsHitTestVisible="True">
 
-						<!-- Previous -->
-						<Button PointerPressed="OnPrevClicked"
+						<Button Tapped="OnPrevClicked"
 								Background="Transparent"
 								BorderThickness="0"
-								Focusable ="false">
+								Focusable="False">
 							<TextBlock Text="⏮" FontSize="48" Foreground="White"/>
 						</Button>
 
-						<!-- Play / Pause -->
-						<Button PointerPressed="OnPlayPauseClicked"
+						<Button Tapped="OnPlayPauseClicked"
 								Background="Transparent"
-								BorderThickness="0">
+								BorderThickness="0"
+								Focusable="False">
 							<TextBlock x:Name="PlayPauseIcon"
 									   Text="⏯"
 									   FontSize="48"
 									   Foreground="White"/>
 						</Button>
 
-						<!-- Next -->
-						<Button PointerPressed="OnNextClicked"
+						<Button Tapped="OnNextClicked"
 								Background="Transparent"
-								BorderThickness="0">
+								BorderThickness="0"
+								Focusable="False">
 							<TextBlock Text="⏭" FontSize="48" Foreground="White"/>
 						</Button>
 
 					</StackPanel>
+
 				</Grid>
 			</Border>
+
 
 
 
