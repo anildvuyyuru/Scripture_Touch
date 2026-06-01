@@ -6,25 +6,51 @@
         WindowState="Maximized"
         SystemDecorations="None"
         Topmost="True"
-		PointerPressed="OnScreenTapped">
+        PointerPressed="OnScreenTapped">
 
-	<Grid>		
-		
-        <!-- Background image -->
-        <Image x:Name="BgImage" Stretch="UniformToFill"/>
+	<Window.Styles>
+		<Style Selector="Border#SettingsPanel.slideIn">
+			<Style.Animations>
+				<Animation Duration="0:0:0.3" Easing="CubicEaseOut" FillMode="Forward">
+					<KeyFrame Cue="0%">
+						<Setter Property="TranslateTransform.X" Value="-300"/>
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="TranslateTransform.X" Value="0"/>
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
 
-        <!-- Dim overlay -->
-        <Border Background="#70000000"/>
+		<Style Selector="Border#SettingsPanel.slideOut">
+			<Style.Animations>
+				<Animation Duration="0:0:0.3" Easing="CubicEaseIn" FillMode="Forward">
+					<KeyFrame Cue="0%">
+						<Setter Property="TranslateTransform.X" Value="0"/>
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="TranslateTransform.X" Value="-300"/>
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
+	</Window.Styles>
 
-        <!-- Verse content -->
-        <Grid Margin="94">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+	<Grid>
+		<!-- Background image -->
+		<Image x:Name="BgImage" Stretch="UniformToFill"/>
 
-			
-				<!-- Verse text -->
+		<!-- Dim overlay -->
+		<Border Background="#70000000"/>
+
+		<!-- Verse content -->
+		<Grid Margin="94">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+			<!-- Verse text -->
 			<TextBlock Grid.Row="0"
                        x:Name="VerseText"
                        VerticalAlignment="Center"
@@ -33,87 +59,107 @@
                        Foreground="White"
                        FontWeight="SemiBold"
                        TextWrapping="Wrap"
-                       TextTrimming="WordEllipsis">
+                       TextTrimming="WordEllipsis"/>
 
-			</TextBlock>
-			
-            
-
-            <!-- Reference and footer -->
-            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
-                <TextBlock x:Name="RefBlock"
+			<!-- Reference and footer -->
+			<StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
+				<TextBlock x:Name="RefBlock"
                            Foreground="#E6E6E6"
                            FontSize="28"
                            TextAlignment="Right" />
 
-                <TextBlock x:Name="InfoLeft"
+				<TextBlock x:Name="InfoLeft"
                            Foreground="#C8C8C8"
                            FontSize="24"
                            HorizontalAlignment="Left"
                            IsVisible="True" />
-            </StackPanel>
-
-			<Border x:Name="BottomPopup"
-					CornerRadius="40"
-					Padding="0"
-					HorizontalAlignment="Center"
-					VerticalAlignment="Bottom"
-					Margin="0,0,0,40"
-					Opacity="0"
-					IsVisible="False">
-				<Grid>
-
-					<!-- Blurred + tinted background -->
-					<Border CornerRadius="40"
-							IsHitTestVisible="False">
-						<Border.Effect>
-							<BlurEffect Radius="20"/>
-						</Border.Effect>
-						<Border.Background>
-							<SolidColorBrush Color="#101010" Opacity="0.75"/>
-						</Border.Background>
-					</Border>
-
-					<!-- Interactive content -->
-					<StackPanel Orientation="Horizontal"
-								Spacing="50"
-								Margin="25,20"
-								HorizontalAlignment="Center"
-								VerticalAlignment="Center"
-								IsHitTestVisible="True">
-
-						<Button Tapped="OnPrevClicked"
-								Background="Transparent"
-								BorderThickness="0"
-								Focusable="False">
-							<TextBlock Text="⏮" FontSize="48" Foreground="White"/>
-						</Button>
-
-						<Button Tapped="OnPlayPauseClicked"
-								Background="Transparent"
-								BorderThickness="0"
-								Focusable="False">
-							<TextBlock x:Name="PlayPauseIcon"
-									   Text="⏯"
-									   FontSize="48"
-									   Foreground="White"/>
-						</Button>
-
-						<Button Tapped="OnNextClicked"
-								Background="Transparent"
-								BorderThickness="0"
-								Focusable="False">
-							<TextBlock Text="⏭" FontSize="48" Foreground="White"/>
-						</Button>
-
-					</StackPanel>
-
-				</Grid>
-			</Border>
-
-
-
-
+			</StackPanel>
 		</Grid>
-    </Grid>
+
+		<Border x:Name="BottomPopup"
+				CornerRadius="40"
+				Padding="0"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Bottom"
+				Margin="0,0,0,40"
+				Opacity="0"
+				IsVisible="False">
+			<Grid>
+				<!-- Blurred + tinted background -->
+				<Border CornerRadius="40"
+						IsHitTestVisible="False"
+						BorderBrush="#FFFFFFFF"
+						BorderThickness="2">
+					<Border.Effect>
+						<BlurEffect Radius="20"/>
+					</Border.Effect>
+					<Border.Background>
+						<SolidColorBrush Color="#1A1A1A" Opacity="0.50"/>
+					</Border.Background>
+				</Border>
+
+				<!-- Interactive content -->
+				<StackPanel Orientation="Horizontal"
+							Spacing="50"
+							Margin="25,20"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Center"
+							IsHitTestVisible="False">
+
+					<Button Tapped="OnPrevTapped"
+							Background="Transparent"
+							BorderThickness="0"
+							Focusable="False">
+						<TextBlock Text="⏮" FontSize="48" Foreground="White"/>
+					</Button>
+
+					<Button Tapped="OnPlayPauseTapped"
+							Background="Transparent"
+							BorderThickness="0"
+							Focusable="False">
+						<TextBlock x:Name="PlayPauseIcon"
+								   Text="⏯"
+								   FontSize="48"
+								   Foreground="White"/>
+					</Button>
+
+					<Button Tapped="OnNextTapped"
+							Background="Transparent"
+							BorderThickness="0"
+							Focusable="False">
+						<TextBlock Text="⏭" FontSize="48" Foreground="White"/>
+					</Button>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<Border x:Name="SettingsPanel"
+        Width="300"
+        Background="#101010AA"
+        BorderBrush="#FFFFFF22"
+        BorderThickness="1"
+        HorizontalAlignment="Left"
+        IsVisible="False">
+			<Border.RenderTransform>
+				<TranslateTransform X="-300"/>
+			</Border.RenderTransform>
+
+			<StackPanel Margin="20" Spacing="20">
+				<TextBlock Text="Settings Panel" Foreground="White"/>
+			</StackPanel>
+		</Border>
+
+		<Button x:Name="SettingsButton"
+				ZIndex="999"
+		        Width="60"
+		        Height="60"
+		        HorizontalAlignment="Right"
+		        VerticalAlignment="Bottom"
+		        Margin="0 0 20 20"
+		        Background="Transparent"
+		        BorderThickness="0"
+		        Click="OnSettingsTapped">
+			<TextBlock Text="⚙" FontSize="36" Foreground="White"/>
+		</Button>
+	</Grid>
 </Window>

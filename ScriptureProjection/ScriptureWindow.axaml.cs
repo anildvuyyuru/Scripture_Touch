@@ -10,6 +10,8 @@ using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using ScriptureFlow_Touch.Entities;
+using ScriptureProjection.Entities;
 using ScriptureProjection.Interfaces;
 using System.Device.Gpio;
 
@@ -25,6 +27,7 @@ public partial class ScriptureWindow : Window
     private bool _isPopupVisible = false;
     private Animation _showAnimation;
     private Animation _hideAnimation;
+    private bool _settingsOpen = false;
 
     private readonly Dictionary<string, int> _pins = new()
     {
@@ -51,7 +54,8 @@ public partial class ScriptureWindow : Window
     public ScriptureWindow()
     {
         InitializeComponent();
-        //InitializeAnimations();
+        InitializeAnimations(); // <- ensure _showAnimation and _hideAnimation are initialized
+        DataContext = new SettingsViewModel();
     }
 
     public void Initialize(IServiceProvider serviceProvider)
@@ -127,8 +131,17 @@ public partial class ScriptureWindow : Window
         };
     }
 
-    private async void OnScreenTapped(object? sender, RoutedEventArgs e)
+    private async void OnScreenTapped(object? sender, PointerPressedEventArgs e)
     {
+        Console.WriteLine($"OnScreenTapped, _settingsOpen={_settingsOpen}, visible={SettingsPanel.IsVisible}");
+
+        // If settings panel is open or visible, ignore this tap
+        if (_settingsOpen || SettingsPanel.IsVisible)
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (!_isPopupVisible)
         {
             // Prepare and show popup           
@@ -492,7 +505,7 @@ public partial class ScriptureWindow : Window
         Dispatcher.UIThread.Post(() => control.Opacity = to);
     }
 
-    private async void OnPrevClicked(object? sender, RoutedEventArgs e)
+    private async void OnPrevTapped(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
             return;
@@ -501,7 +514,7 @@ public partial class ScriptureWindow : Window
         await UpdateVerseAsync();
     }
 
-    private async void OnNextClicked(object? sender, RoutedEventArgs e)
+    private async void OnNextTapped(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
             return;
@@ -510,7 +523,7 @@ public partial class ScriptureWindow : Window
         await UpdateVerseAsync();
     }
 
-    private async void OnPlayPauseClicked(object? sender, RoutedEventArgs e)
+    private async void OnPlayPauseTapped(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
             return;
@@ -530,6 +543,44 @@ public partial class ScriptureWindow : Window
         }
 
         await UpdateInfoAsync();
+    }
+
+    private async void OnSettingsTapped(object? sender, RoutedEventArgs e)
+    {
+        if (!_settingsOpen)
+        {
+            // Clear slideOut if it exists, apply slideIn
+            SettingsPanel.Classes.Remove("slideOut");
+            SettingsPanel.Classes.Add("slideIn");
+            SettingsPanel.IsVisible = true;
+            _settingsOpen = true;
+        }
+        else
+        {
+            // Clear slideIn, apply slideOut
+            SettingsPanel.Classes.Remove("slideIn");
+            SettingsPanel.Classes.Add("slideOut");
+
+            _settingsOpen = false;
+
+            // Wait for 300ms animation duration before toggling visibility off 
+            // so layout doesn't hide it instantly mid-slide.
+            await Task.Delay(300);
+
+            // Only hide it if the user didn't instantly try reopening it during the delay
+            if (!_settingsOpen)
+            {
+                SettingsPanel.IsVisible = false;
+            }
+        }
+    }
+
+
+
+
+    private void SettingsButton_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        e.Handled = true;
     }
 
 

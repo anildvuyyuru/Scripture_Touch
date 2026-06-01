@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<OutputType>WinExe</OutputType>
+		<OutputType>Exe</OutputType>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PublishSingleFile>true</PublishSingleFile>
@@ -61,6 +61,9 @@
 	  </None>
 	  <None Update="Scripture.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+	  </None>	
+	</ItemGroup>
+	<ItemGroup>
+		<AvaloniaResource Include="Assets\**" />
 	</ItemGroup>
 </Project>
