@@ -13,7 +13,7 @@
 			<Style.Animations>
 				<Animation Duration="0:0:0.3" Easing="CubicEaseOut" FillMode="Forward">
 					<KeyFrame Cue="0%">
-						<Setter Property="TranslateTransform.X" Value="-300"/>
+						<Setter Property="TranslateTransform.X" Value="300"/>
 					</KeyFrame>
 					<KeyFrame Cue="100%">
 						<Setter Property="TranslateTransform.X" Value="0"/>
@@ -29,11 +29,12 @@
 						<Setter Property="TranslateTransform.X" Value="0"/>
 					</KeyFrame>
 					<KeyFrame Cue="100%">
-						<Setter Property="TranslateTransform.X" Value="-300"/>
+						<Setter Property="TranslateTransform.X" Value="300"/>
 					</KeyFrame>
 				</Animation>
 			</Style.Animations>
 		</Style>
+		
 	</Window.Styles>
 
 	<Grid>
@@ -77,16 +78,15 @@
 		</Grid>
 
 		<Border x:Name="BottomPopup"
-				CornerRadius="40"
-				Padding="0"
-				HorizontalAlignment="Center"
-				VerticalAlignment="Bottom"
-				Margin="0,0,0,40"
-				Opacity="0"
-				IsVisible="False">
+        CornerRadius="50" Padding="0"
+        Width="600"
+        Height="100" HorizontalAlignment="Center"
+        VerticalAlignment="Bottom"
+        Margin="0,0,0,40"
+        Opacity="0"
+        IsVisible="False">
 			<Grid>
-				<!-- Blurred + tinted background -->
-				<Border CornerRadius="40"
+				<Border CornerRadius="50"
 						IsHitTestVisible="False"
 						BorderBrush="#FFFFFFFF"
 						BorderThickness="2">
@@ -98,36 +98,36 @@
 					</Border.Background>
 				</Border>
 
-				<!-- Interactive content -->
 				<StackPanel Orientation="Horizontal"
-							Spacing="50"
-							Margin="25,20"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"
-							IsHitTestVisible="False">
+            Spacing="70"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsHitTestVisible="True">
 
-					<Button Tapped="OnPrevTapped"
-							Background="Transparent"
-							BorderThickness="0"
-							Focusable="False">
-						<TextBlock Text="⏮" FontSize="48" Foreground="White"/>
+					<Button Tapped="OnPrevTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
+						<Grid Width="64" Height="64">
+							<Path Data="M 4,0 L 10,0 L 10,48 L 4,48 Z M 10,24 L 30,0 L 30,48 Z M 30,24 L 50,0 L 50,48 Z"
+								  Fill="White" Stretch="Uniform" Margin="16"
+								  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</Grid>
 					</Button>
 
-					<Button Tapped="OnPlayPauseTapped"
-							Background="Transparent"
-							BorderThickness="0"
-							Focusable="False">
-						<TextBlock x:Name="PlayPauseIcon"
-								   Text="⏯"
-								   FontSize="48"
-								   Foreground="White"/>
+					<Button Tapped="OnPlayPauseTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
+						<ContentControl x:Name="PlayPauseIcon">
+							<Grid Width="64" Height="64">
+								<Path Data="M 16,12 L 26,12 L 26,52 L 16,52 Z M 38,12 L 48,12 L 48,52 L 38,52 Z"
+									  Fill="White" Stretch="Uniform" Margin="16"
+									  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							</Grid>
+						</ContentControl>
 					</Button>
 
-					<Button Tapped="OnNextTapped"
-							Background="Transparent"
-							BorderThickness="0"
-							Focusable="False">
-						<TextBlock Text="⏭" FontSize="48" Foreground="White"/>
+					<Button Tapped="OnNextTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
+						<Grid Width="64" Height="64">
+							<Path Data="M 4,0 L 24,24 L 4,48 Z M 24,0 L 44,24 L 24,48 Z M 44,0 L 50,0 L 50,48 L 44,48 Z"
+								  Fill="White" Stretch="Uniform" Margin="16"
+								  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</Grid>
 					</Button>
 				</StackPanel>
 			</Grid>
@@ -138,10 +138,10 @@
         Background="#101010AA"
         BorderBrush="#FFFFFF22"
         BorderThickness="1"
-        HorizontalAlignment="Left"
+        HorizontalAlignment="Right"
         IsVisible="False">
 			<Border.RenderTransform>
-				<TranslateTransform X="-300"/>
+				<TranslateTransform X="300"/>
 			</Border.RenderTransform>
 
 			<StackPanel Margin="20" Spacing="20">

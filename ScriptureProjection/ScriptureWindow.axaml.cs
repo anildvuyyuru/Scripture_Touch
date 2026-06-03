@@ -505,6 +505,47 @@ public partial class ScriptureWindow : Window
         Dispatcher.UIThread.Post(() => control.Opacity = to);
     }
 
+    //private async void OnPrevTapped(object? sender, RoutedEventArgs e)
+    //{
+    //    if (_scriptureService == null)
+    //        return;
+
+    //    _verseIndex = await _scriptureService.GetPreviousVerseIndex(_data, _group, _verseIndex);
+    //    await UpdateVerseAsync();
+    //}
+
+    //private async void OnNextTapped(object? sender, RoutedEventArgs e)
+    //{
+    //    if (_scriptureService == null)
+    //        return;
+
+    //    _verseIndex = await _scriptureService.GetNextVerseIndex(_data, _group, _verseIndex);
+    //    await UpdateVerseAsync();
+    //}
+
+    //private async void OnPlayPauseTapped(object? sender, RoutedEventArgs e)
+    //{
+    //    if (_scriptureService == null)
+    //        return;
+
+    //    var interval = await _scriptureService.ToggleRun(_intervalIndex, _intervals, _isRunning);
+    //    _isRunning = !_isRunning;
+
+    //    if (_isRunning && interval != null)
+    //    {
+    //        _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
+    //        PlayPauseIcon.Text = "⏸"; // Pause icon
+    //    }
+    //    else
+    //    {
+    //        _timerService?.Stop();
+    //        PlayPauseIcon.Text = "▶"; // Play icon
+    //    }
+
+    //    await UpdateInfoAsync();
+    //}
+
+    // Ensure the second parameter is exactly 'RoutedEventArgs e'
     private async void OnPrevTapped(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
@@ -514,6 +555,7 @@ public partial class ScriptureWindow : Window
         await UpdateVerseAsync();
     }
 
+    // Ensure the second parameter is exactly 'RoutedEventArgs e'
     private async void OnNextTapped(object? sender, RoutedEventArgs e)
     {
         if (_scriptureService == null)
@@ -534,12 +576,37 @@ public partial class ScriptureWindow : Window
         if (_isRunning && interval != null)
         {
             _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
-            PlayPauseIcon.Text = "⏸"; // Pause icon
+
+            var grid = new Avalonia.Controls.Grid { Width = 64, Height = 64 };
+            grid.Children.Add(new Avalonia.Controls.Shapes.Path
+            {
+                Data = Avalonia.Media.StreamGeometry.Parse("M 16,12 L 26,12 L 26,52 L 16,52 Z M 38,12 L 48,12 L 48,52 L 38,52 Z"),
+                Fill = Avalonia.Media.Brushes.White,
+                Stretch = Avalonia.Media.Stretch.Uniform,
+                Margin = new Avalonia.Thickness(16), // Sized down to sit nicely within the ring
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+            });
+
+            PlayPauseIcon.Content = grid;
         }
         else
         {
             _timerService?.Stop();
-            PlayPauseIcon.Text = "▶"; // Play icon
+
+            var grid = new Avalonia.Controls.Grid { Width = 64, Height = 64 };
+            grid.Children.Add(new Avalonia.Controls.Shapes.Path
+            {
+                Data = Avalonia.Media.StreamGeometry.Parse("M 20,12 L 52,32 L 20,52 Z"),
+                Fill = Avalonia.Media.Brushes.White,
+                Stretch = Avalonia.Media.Stretch.Uniform,
+                // Sized down + extra left offset padding (22 instead of 16) to lock visual center
+                Margin = new Avalonia.Thickness(22, 16, 16, 16),
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+            });
+
+            PlayPauseIcon.Content = grid;
         }
 
         await UpdateInfoAsync();
@@ -574,9 +641,6 @@ public partial class ScriptureWindow : Window
             }
         }
     }
-
-
-
 
     private void SettingsButton_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
