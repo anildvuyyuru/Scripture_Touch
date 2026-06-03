@@ -9,7 +9,7 @@
         PointerPressed="OnScreenTapped">
 
 	<Window.Styles>
-		<Style Selector="Border#SettingsPanel.slideIn">
+		<Style Selector="Panel#SettingsPanel.slideIn">
 			<Style.Animations>
 				<Animation Duration="0:0:0.3" Easing="CubicEaseOut" FillMode="Forward">
 					<KeyFrame Cue="0%">
@@ -22,7 +22,7 @@
 			</Style.Animations>
 		</Style>
 
-		<Style Selector="Border#SettingsPanel.slideOut">
+		<Style Selector="Panel#SettingsPanel.slideOut">
 			<Style.Animations>
 				<Animation Duration="0:0:0.3" Easing="CubicEaseIn" FillMode="Forward">
 					<KeyFrame Cue="0%">
@@ -34,53 +34,67 @@
 				</Animation>
 			</Style.Animations>
 		</Style>
-		
 	</Window.Styles>
 
 	<Grid>
-		<!-- Background image -->
 		<Image x:Name="BgImage" Stretch="UniformToFill"/>
 
-		<!-- Dim overlay -->
 		<Border Background="#70000000"/>
 
-		<!-- Verse content -->
-		<Grid Margin="94">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
+		<Grid ColumnDefinitions="*, Auto">
 
-			<!-- Verse text -->
-			<TextBlock Grid.Row="0"
-                       x:Name="VerseText"
-                       VerticalAlignment="Center"
-                       TextAlignment="Center"
-                       Margin="0,20,0,0"
-                       Foreground="White"
-                       FontWeight="SemiBold"
-                       TextWrapping="Wrap"
-                       TextTrimming="WordEllipsis"/>
+			<Grid Grid.Column="0" Margin="94,94,40,94">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
 
-			<!-- Reference and footer -->
-			<StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
-				<TextBlock x:Name="RefBlock"
-                           Foreground="#E6E6E6"
-                           FontSize="28"
-                           TextAlignment="Right" />
+				<TextBlock Grid.Row="0"
+                           x:Name="VerseText"
+                           VerticalAlignment="Center"
+                           TextAlignment="Center"
+                           Margin="0,20,0,0"
+                           Foreground="White"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"
+                           TextTrimming="WordEllipsis"/>
 
-				<TextBlock x:Name="InfoLeft"
-                           Foreground="#C8C8C8"
-                           FontSize="24"
-                           HorizontalAlignment="Left"
-                           IsVisible="True" />
-			</StackPanel>
+				<StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
+					<TextBlock x:Name="RefBlock"
+                               Foreground="#E6E6E6"
+                               FontSize="28"
+                               TextAlignment="Right" />
+					<TextBlock x:Name="InfoLeft"
+                               Foreground="#C8C8C8"
+                               FontSize="24"
+                               HorizontalAlignment="Left"
+                               IsVisible="True" />
+				</StackPanel>
+			</Grid>
+
+			<Panel Grid.Column="1"
+       x:Name="SettingsPanel"
+       Width="300"
+       Background="#731A1A1A" Focusable="False"
+       KeyboardNavigation.IsTabStop="False"
+       IsVisible="False">
+
+				<Panel.RenderTransform>
+					<TranslateTransform X="300"/>
+				</Panel.RenderTransform>
+
+				<StackPanel Margin="20" Spacing="20">
+					<TextBlock Text="Settings Panel" Foreground="White"/>
+				</StackPanel>
+			</Panel>
 		</Grid>
 
 		<Border x:Name="BottomPopup"
-        CornerRadius="50" Padding="0"
+        CornerRadius="50"
+        Padding="0"
         Width="600"
-        Height="100" HorizontalAlignment="Center"
+        Height="100"
+        HorizontalAlignment="Center"
         VerticalAlignment="Bottom"
         Margin="0,0,0,40"
         Opacity="0"
@@ -94,15 +108,15 @@
 						<BlurEffect Radius="20"/>
 					</Border.Effect>
 					<Border.Background>
-						<SolidColorBrush Color="#1A1A1A" Opacity="0.50"/>
+						<SolidColorBrush Color="#1A1A1A" Opacity="0.45"/>
 					</Border.Background>
 				</Border>
 
 				<StackPanel Orientation="Horizontal"
-            Spacing="70"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            IsHitTestVisible="True">
+							Spacing="70"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Center"
+							IsHitTestVisible="True">
 
 					<Button Tapped="OnPrevTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
 						<Grid Width="64" Height="64">
@@ -133,32 +147,16 @@
 			</Grid>
 		</Border>
 
-		<Border x:Name="SettingsPanel"
-        Width="300"
-        Background="#101010AA"
-        BorderBrush="#FFFFFF22"
-        BorderThickness="1"
-        HorizontalAlignment="Right"
-        IsVisible="False">
-			<Border.RenderTransform>
-				<TranslateTransform X="300"/>
-			</Border.RenderTransform>
-
-			<StackPanel Margin="20" Spacing="20">
-				<TextBlock Text="Settings Panel" Foreground="White"/>
-			</StackPanel>
-		</Border>
-
 		<Button x:Name="SettingsButton"
-				ZIndex="999"
-		        Width="60"
-		        Height="60"
-		        HorizontalAlignment="Right"
-		        VerticalAlignment="Bottom"
-		        Margin="0 0 20 20"
-		        Background="Transparent"
-		        BorderThickness="0"
-		        Click="OnSettingsTapped">
+                ZIndex="999"
+                Width="60"
+                Height="60"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,20,20"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="OnSettingsTapped">
 			<TextBlock Text="⚙" FontSize="36" Foreground="White"/>
 		</Button>
 	</Grid>
