@@ -71,26 +71,115 @@
                                IsVisible="True" />
 				</StackPanel>
 			</Grid>
-
+<!-- Settings Panel -->
 			<Panel Grid.Column="1"
-       x:Name="SettingsPanel"
-       Width="300"
-       Background="#731A1A1A" Focusable="False"
-       KeyboardNavigation.IsTabStop="False"
-       IsVisible="False">
+	   x:Name="SettingsPanel"
+	   Width="350"
+	   Focusable="False"
+	   KeyboardNavigation.IsTabStop="False"
+	   IsVisible="False">
 
 				<Panel.RenderTransform>
 					<TranslateTransform X="300"/>
 				</Panel.RenderTransform>
 
-				<StackPanel Margin="20" Spacing="20">
-					<TextBlock Text="Settings Panel" Foreground="White"/>
+				<!-- 1. Completely clear glass base matching your new preference -->
+				<Border x:Name="SettingsGlassBase"
+						CornerRadius="40 0 0 40"
+						IsHitTestVisible="False"
+						BorderBrush="#35FFFFFF"
+					BorderThickness="1 1 0 1">
+					<Border.Background>
+						<!-- Smooth, clear white tint with no blur effect -->
+						<SolidColorBrush Color="White" Opacity="0.15"/>
+					</Border.Background>
+				</Border>
+
+				<!-- 2. Inner depth 'lip' border for crisp glass physics -->
+				<Border CornerRadius="40 0 0 40"
+						Padding="1"
+						Margin="0"
+						IsHitTestVisible="False">
+					<Border CornerRadius="40 0 0 40"
+							Background="#05FFFFFF"
+							BorderBrush="#25FFFFFF"
+							BorderThickness="1 1 0 1"/>
+				</Border>
+
+				<!-- 3. Your original settings content -->
+				<StackPanel Margin="35" Spacing="20">
+					<TextBlock Text="Settings" Foreground="White" FontWeight="SemiBold" FontSize="34"/>
+					
+					<!-- Rest of your settings elements go here -->
+
+					<StackPanel Margin="20" Spacing="25">
+						<TextBlock Text="Verse Categories"
+								   Foreground="White"
+								   FontWeight="SemiBold"
+								   FontSize="24"
+								   Margin="0,0,0,10"/>
+
+						<StackPanel Spacing="18">
+
+							<Grid ColumnDefinitions="*, Auto">
+								<TextBlock Grid.Column="0" Text="Promises" Foreground="White" FontSize="20" FontWeight="Medium" 
+										   VerticalAlignment="Center" />
+								<ToggleSwitch Grid.Column="1"
+											  x:Name="Promises"
+											  IsChecked="True"
+											  OnContent=""
+											  OffContent=""
+											  IsCheckedChanged="OnCategoryCheckedChanged"/>
+							</Grid>
+
+							<Separator Background="#15FFFFFF" Height="1"/>
+
+							<Grid ColumnDefinitions="*, Auto">
+								<TextBlock Grid.Column="0" Text="Proverbs" Foreground="White" FontSize="20" FontWeight="Medium" 
+										   VerticalAlignment="Center" />
+								<ToggleSwitch Grid.Column="1"
+											  x:Name="Proverbs"
+											  IsChecked="False"
+											  OnContent=""
+											  OffContent=""
+											  IsCheckedChanged="OnCategoryCheckedChanged"/>
+							</Grid>
+
+							<Separator Background="#15FFFFFF" Height="1"/>
+
+							<Grid ColumnDefinitions="*, Auto">
+								<TextBlock Grid.Column="0" Text="Psalms" Foreground="White" FontSize="20" FontWeight="Medium" 
+										   VerticalAlignment="Center" />
+								<ToggleSwitch Grid.Column="1"
+											  x:Name="Psalms"
+											  IsChecked="False"
+											  OnContent=""
+											  OffContent=""
+											  IsCheckedChanged="OnCategoryCheckedChanged"/>
+							</Grid>
+
+							<Separator Background="#15FFFFFF" Height="1"/>
+
+							<Grid ColumnDefinitions="*, Auto">
+								<TextBlock Grid.Column="0" Text="Encouragement" Foreground="White" FontSize="20" FontWeight="Medium" 
+										   VerticalAlignment="Center" />
+								<ToggleSwitch Grid.Column="1"
+											  x:Name="Encouragement"
+											  IsChecked="False"
+											  OnContent=""
+											  OffContent=""
+											  IsCheckedChanged="OnCategoryCheckedChanged"/>
+							</Grid>
+
+						</StackPanel>
+					</StackPanel>
 				</StackPanel>
 			</Panel>
-		</Grid>
+	<!-- End Settings Panel -->
+</Grid>
 
 		<Border x:Name="BottomPopup"
-        CornerRadius="50"
+        CornerRadius="60"
         Padding="0"
         Width="600"
         Height="100"
@@ -100,16 +189,27 @@
         Opacity="0"
         IsVisible="False">
 			<Grid>
-				<Border CornerRadius="50"
+				<!-- 1. Match CornerRadius to parent to prevent corner bleeding -->
+				<Border x:Name="GlassBase"
+						CornerRadius="60"
 						IsHitTestVisible="False"
-						BorderBrush="#FFFFFFFF"
-						BorderThickness="2">
-					<Border.Effect>
-						<BlurEffect Radius="20"/>
-					</Border.Effect>
+						BorderBrush="#20FFFFFF"
+						BorderThickness="1">					
 					<Border.Background>
-						<SolidColorBrush Color="#1A1A1A" Opacity="0.45"/>
+						<!-- 3. Pure white base with slight opacity for clean frosted glass -->
+						<SolidColorBrush Color="White" Opacity="0.15"/>
 					</Border.Background>
+				</Border>
+
+				<!-- This inner border adds a sophisticated, thin 'lip' to sell the depth -->
+				<Border CornerRadius="60"
+						Padding="1"
+						Margin="0"
+						IsHitTestVisible="False">
+					<Border CornerRadius="60"
+							Background="#05FFFFFF"
+							BorderBrush="#25FFFFFF"
+							BorderThickness="1"/>
 				</Border>
 
 				<StackPanel Orientation="Horizontal"

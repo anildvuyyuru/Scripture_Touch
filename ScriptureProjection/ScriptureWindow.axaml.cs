@@ -28,6 +28,8 @@ public partial class ScriptureWindow : Window
     private Animation _showAnimation;
     private Animation _hideAnimation;
     private bool _settingsOpen = false;
+    private bool _isUpdatingToggles = false;
+  
 
     private readonly Dictionary<string, int> _pins = new()
     {
@@ -160,7 +162,6 @@ public partial class ScriptureWindow : Window
 
     }
 
-
     private async Task RunSerialized(Func<Task> action)
     {
         if (_scriptureService == null)
@@ -201,32 +202,6 @@ public partial class ScriptureWindow : Window
             Console.WriteLine(ex);
             ShowError("Error loading verses.");
         }
-    }
-
-    private void InitGpio()
-    {
-        foreach (var pin in _pins.Values)
-        {
-            var isPinOpen = _gpioService?.IsPinOpen(pin);
-            if (isPinOpen != null && (bool)!isPinOpen)
-                _gpioService?.OpenPin(pin, PinMode.InputPullUp);
-        }
-
-        Register("Promises", () => _ = RunSerialized(() => SetGroupAsync("Promises")));
-        Register("Encouragement", () => _ = RunSerialized(() => SetGroupAsync("Encouragement")));
-        Register("Proverbs", () => _ = RunSerialized(() => SetGroupAsync("Proverbs")));
-        Register("Psalms", () => _ = RunSerialized(() => SetGroupAsync("Psalms")));
-        Register("Freq", () => _ = RunSerialized(CycleFrequencyAsync));
-        Register("StartStop", () => _ = RunSerialized(ToggleRunAsync));
-        Register("Next", () => _ = RunSerialized(NextVerseAsync));
-        Register("Prev", () => _ = RunSerialized(PrevVerseAsync));
-        Register("Shutdown", ShutdownPi);
-    }
-
-    private void Register(string key, Action action)
-    {
-        var pin = _pins[key];
-        _gpioService?.RegisterCallback(pin, action);
     }
 
     private async Task SetBackgroundAsync(string? path)
@@ -277,7 +252,7 @@ public partial class ScriptureWindow : Window
         InfoLeft.Text = "Error";
     }
 
-    private async Task SetGroupAsync(string g)
+    private async Task SetGroupAsync(string? g)
     {
         if (!_data.Groups.ContainsKey(g))
             return;
@@ -505,46 +480,6 @@ public partial class ScriptureWindow : Window
         Dispatcher.UIThread.Post(() => control.Opacity = to);
     }
 
-    //private async void OnPrevTapped(object? sender, RoutedEventArgs e)
-    //{
-    //    if (_scriptureService == null)
-    //        return;
-
-    //    _verseIndex = await _scriptureService.GetPreviousVerseIndex(_data, _group, _verseIndex);
-    //    await UpdateVerseAsync();
-    //}
-
-    //private async void OnNextTapped(object? sender, RoutedEventArgs e)
-    //{
-    //    if (_scriptureService == null)
-    //        return;
-
-    //    _verseIndex = await _scriptureService.GetNextVerseIndex(_data, _group, _verseIndex);
-    //    await UpdateVerseAsync();
-    //}
-
-    //private async void OnPlayPauseTapped(object? sender, RoutedEventArgs e)
-    //{
-    //    if (_scriptureService == null)
-    //        return;
-
-    //    var interval = await _scriptureService.ToggleRun(_intervalIndex, _intervals, _isRunning);
-    //    _isRunning = !_isRunning;
-
-    //    if (_isRunning && interval != null)
-    //    {
-    //        _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
-    //        PlayPauseIcon.Text = "⏸"; // Pause icon
-    //    }
-    //    else
-    //    {
-    //        _timerService?.Stop();
-    //        PlayPauseIcon.Text = "▶"; // Play icon
-    //    }
-
-    //    await UpdateInfoAsync();
-    //}
-
     // Ensure the second parameter is exactly 'RoutedEventArgs e'
     private async void OnPrevTapped(object? sender, RoutedEventArgs e)
     {
@@ -647,5 +582,35 @@ public partial class ScriptureWindow : Window
         e.Handled = true;
     }
 
+    private async void OnCategoryCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        // Prevent recursive loops when updating programmatically
+        if (_isUpdatingToggles) return;
+
+        if (sender is ToggleSwitch clickedVerseCategory)
+        {
+            // Safety check: If the user tries to turn off the ONLY active switch,
+            // force it back to True (ensuring at least one category is always selected).
+            if (clickedVerseCategory.IsChecked == false)
+            {
+                _isUpdatingToggles = true;
+                clickedVerseCategory.IsChecked = true;
+                _isUpdatingToggles = false;
+                return;
+            }
+
+            // Reversal logic: If a switch was turned ON, turn all others OFF
+            _isUpdatingToggles = true;
+
+            if (clickedVerseCategory != Promises) Promises.IsChecked = false;
+            if (clickedVerseCategory != Proverbs) Proverbs.IsChecked = false;
+            if (clickedVerseCategory != Psalms) Psalms.IsChecked = false;
+            if (clickedVerseCategory != Encouragement) Encouragement.IsChecked = false;
+
+            _isUpdatingToggles = false;
+
+            await SetGroupAsync(clickedVerseCategory.Name);
+        }
+    }
 
 }
