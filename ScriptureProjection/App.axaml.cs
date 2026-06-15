@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using ScriptureProjection.Services;
+using ScriptureFlow_Touch.Services;
 
-namespace ScriptureProjection;
+namespace ScriptureFlow_Touch;
 public partial class App : Application
 {
     public override void Initialize() => AvaloniaXamlLoader.Load(this);

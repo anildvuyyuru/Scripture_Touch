@@ -1,4 +1,4 @@
-﻿namespace ScriptureProjection.Entities
+﻿namespace ScriptureFlow_Touch.Entities
 {
     public class Scripture
     {

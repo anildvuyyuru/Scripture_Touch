@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ScriptureProjection.Entities;
-using ScriptureProjection.Interfaces;
+using ScriptureFlow_Touch.Entities;
+using ScriptureFlow_Touch.Interfaces;
 using System.Globalization;
 using System.Text.Json;
 
-namespace ScriptureProjection.Services
+namespace ScriptureFlow_Touch.Services
 {
     public class ScriptureService : IScriptureService
     {

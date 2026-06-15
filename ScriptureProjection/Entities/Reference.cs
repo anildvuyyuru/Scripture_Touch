@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ScriptureProjection.Entities
+namespace ScriptureFlow_Touch.Entities
 {
     public class Reference
     {

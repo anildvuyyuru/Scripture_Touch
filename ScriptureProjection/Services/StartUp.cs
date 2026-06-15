@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ScriptureProjection.Interfaces;
+using ScriptureFlow_Touch.Interfaces;
 
-namespace ScriptureProjection.Services
+namespace ScriptureFlow_Touch.Services
 {
     public static class StartUp
     {

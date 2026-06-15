@@ -1,9 +1,9 @@
 <!-- App.axaml -->
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ScriptureProjection"
+             xmlns:local="clr-namespace:ScriptureFlow_Touch"
              xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
-             x:Class="ScriptureProjection.App">
+             x:Class="ScriptureFlow_Touch.App">
 
 	<Application.Styles>
 		<fluent:FluentTheme/>

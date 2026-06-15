@@ -1,9 +1,9 @@
 ﻿using Avalonia.Threading;
-using ScriptureProjection.Interfaces;
+using ScriptureFlow_Touch.Interfaces;
 using System.Device.Gpio;
 using System.Collections.Concurrent;
 
-namespace ScriptureProjection.Services
+namespace ScriptureFlow_Touch.Services
 {
     public class GpioService : IGpioService, IDisposable
     {

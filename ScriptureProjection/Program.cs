@@ -2,7 +2,7 @@
 using Avalonia;
 
 
-namespace ScriptureProjection;
+namespace ScriptureFlow_Touch;
 internal static class Program
 {
     public static void Main(string[] args)

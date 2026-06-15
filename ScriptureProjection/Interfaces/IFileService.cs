@@ -1,4 +1,4 @@
-﻿namespace ScriptureProjection.Interfaces
+﻿namespace ScriptureFlow_Touch.Interfaces
 {
     public interface IFileService
     {

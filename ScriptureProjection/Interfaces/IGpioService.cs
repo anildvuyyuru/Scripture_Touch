@@ -1,6 +1,6 @@
 ﻿using System.Device.Gpio;
 
-namespace ScriptureProjection.Interfaces
+namespace ScriptureFlow_Touch.Interfaces
 {
     public interface IGpioService : IDisposable
     {

@@ -3,6 +3,7 @@ using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -11,43 +12,27 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ScriptureFlow_Touch.Entities;
-using ScriptureProjection.Entities;
-using ScriptureProjection.Interfaces;
-using System.Device.Gpio;
+using ScriptureFlow_Touch.Interfaces;
 
-namespace ScriptureProjection;
+namespace ScriptureFlow_Touch;
 
 public partial class ScriptureWindow : Window
 {
     private IScriptureService? _scriptureService;
-    private IGpioSimulatorService? _gpioService;
     private IFileService? _fileService;
     private ITimerService? _timerService;
-    private Entities.Scripture _data = new();
+    private Scripture _data = new();
     private bool _isPopupVisible = false;
-    private Animation _showAnimation;
-    private Animation _hideAnimation;
+    private Animation _showAnimation = null!;
+    private Animation _hideAnimation = null!;
     private bool _settingsOpen = false;
     private bool _isUpdatingToggles = false;
-  
-
-    private readonly Dictionary<string, int> _pins = new()
-    {
-        ["Promises"] = 5,
-        ["Encouragement"] = 6,
-        ["Proverbs"] = 13,
-        ["Psalms"] = 19,
-        ["Freq"] = 26,
-        ["StartStop"] = 16,
-        ["Next"] = 20,
-        ["Prev"] = 21,
-        ["Shutdown"] = 12
-    };
+    private bool _isUpdatingInterval = false;
 
     private bool _isRunning = true;
     private string _group = "Promises";
     private readonly int[] _intervals = [5, 10, 20, 30, 60]; // seconds
-    private int _intervalIndex = 2;
+    private int _intervalIndex = 0;
     private int _verseIndex = 0;
 
     // serialize operations so timer + buttons don’t overlap
@@ -57,20 +42,17 @@ public partial class ScriptureWindow : Window
     {
         InitializeComponent();
         InitializeAnimations(); // <- ensure _showAnimation and _hideAnimation are initialized
-        DataContext = new SettingsViewModel();
     }
 
     public void Initialize(IServiceProvider serviceProvider)
     {
         _scriptureService = serviceProvider.GetService<IScriptureService>();
-        _gpioService = serviceProvider.GetService<IGpioSimulatorService>();
         _fileService = serviceProvider.GetService<IFileService>();
         _timerService = serviceProvider.GetService<ITimerService>();
 
         OpenFullScreen();
 
         _ = LoadVerseDataAsync();
-        //InitGpio();
         StartTimer();
         _ = UpdateBackgroundAsync();
         _ = UpdateVerseAsync();
@@ -141,6 +123,7 @@ public partial class ScriptureWindow : Window
         if (_settingsOpen || SettingsPanel.IsVisible)
         {
             e.Handled = true;
+            await HideSettingsPanel();
             return;
         }
 
@@ -254,7 +237,7 @@ public partial class ScriptureWindow : Window
 
     private async Task SetGroupAsync(string? g)
     {
-        if (!_data.Groups.ContainsKey(g))
+        if (string.IsNullOrWhiteSpace(g) || !_data.Groups.ContainsKey(g))
             return;
 
         _group = g;
@@ -263,42 +246,6 @@ public partial class ScriptureWindow : Window
         await UpdateVerseAsync();
     }
 
-    private async Task CycleFrequencyAsync()
-    {
-        if (_scriptureService == null)
-            return;
-
-        _intervalIndex = (_intervalIndex + 1) % _intervals.Length;
-
-        var interval = await _scriptureService.ChangeFrequency(_intervalIndex, _intervals, _isRunning);
-        if (_isRunning && interval != null)
-        {
-            _timerService?.Stop();
-            _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
-        }
-
-        await UpdateInfoAsync();
-    }
-
-    private async Task ToggleRunAsync()
-    {
-        if (_scriptureService == null)
-            return;
-
-        var interval = await _scriptureService.ToggleRun(_intervalIndex, _intervals, _isRunning);
-        _isRunning = !_isRunning;
-
-        if (_isRunning && interval != null)
-        {
-            _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
-        }
-        else
-        {
-            _timerService?.Stop();
-        }
-
-        await UpdateInfoAsync();
-    }
 
     private async Task NextVerseAsync()
     {
@@ -483,21 +430,13 @@ public partial class ScriptureWindow : Window
     // Ensure the second parameter is exactly 'RoutedEventArgs e'
     private async void OnPrevTapped(object? sender, RoutedEventArgs e)
     {
-        if (_scriptureService == null)
-            return;
-
-        _verseIndex = await _scriptureService.GetPreviousVerseIndex(_data, _group, _verseIndex);
-        await UpdateVerseAsync();
+        await RunSerialized(PrevVerseAsync);
     }
 
     // Ensure the second parameter is exactly 'RoutedEventArgs e'
     private async void OnNextTapped(object? sender, RoutedEventArgs e)
     {
-        if (_scriptureService == null)
-            return;
-
-        _verseIndex = await _scriptureService.GetNextVerseIndex(_data, _group, _verseIndex);
-        await UpdateVerseAsync();
+        await RunSerialized(NextVerseAsync);
     }
 
     private async void OnPlayPauseTapped(object? sender, RoutedEventArgs e)
@@ -512,13 +451,13 @@ public partial class ScriptureWindow : Window
         {
             _timerService?.Start(interval, () => _ = RunSerialized(NextVerseAsync));
 
-            var grid = new Avalonia.Controls.Grid { Width = 64, Height = 64 };
+            var grid = new Grid { Width = 64, Height = 64 };
             grid.Children.Add(new Avalonia.Controls.Shapes.Path
             {
-                Data = Avalonia.Media.StreamGeometry.Parse("M 16,12 L 26,12 L 26,52 L 16,52 Z M 38,12 L 48,12 L 48,52 L 38,52 Z"),
-                Fill = Avalonia.Media.Brushes.White,
-                Stretch = Avalonia.Media.Stretch.Uniform,
-                Margin = new Avalonia.Thickness(16), // Sized down to sit nicely within the ring
+                Data = StreamGeometry.Parse("M 16,12 L 26,12 L 26,52 L 16,52 Z M 38,12 L 48,12 L 48,52 L 38,52 Z"),
+                Fill = Brushes.White,
+                Stretch = Stretch.Uniform,
+                Margin = new Thickness(16), // Sized down to sit nicely within the ring
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
             });
@@ -529,14 +468,14 @@ public partial class ScriptureWindow : Window
         {
             _timerService?.Stop();
 
-            var grid = new Avalonia.Controls.Grid { Width = 64, Height = 64 };
+            var grid = new Grid { Width = 64, Height = 64 };
             grid.Children.Add(new Avalonia.Controls.Shapes.Path
             {
-                Data = Avalonia.Media.StreamGeometry.Parse("M 20,12 L 52,32 L 20,52 Z"),
-                Fill = Avalonia.Media.Brushes.White,
-                Stretch = Avalonia.Media.Stretch.Uniform,
+                Data = StreamGeometry.Parse("M 20,12 L 52,32 L 20,52 Z"),
+                Fill = Brushes.White,
+                Stretch = Stretch.Uniform,
                 // Sized down + extra left offset padding (22 instead of 16) to lock visual center
-                Margin = new Avalonia.Thickness(22, 16, 16, 16),
+                Margin = new Thickness(22, 16, 16, 16),
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
             });
@@ -560,20 +499,25 @@ public partial class ScriptureWindow : Window
         else
         {
             // Clear slideIn, apply slideOut
-            SettingsPanel.Classes.Remove("slideIn");
-            SettingsPanel.Classes.Add("slideOut");
+            await HideSettingsPanel();
+        }
+    }
 
-            _settingsOpen = false;
+    private async Task HideSettingsPanel()
+    {
+        SettingsPanel.Classes.Remove("slideIn");
+        SettingsPanel.Classes.Add("slideOut");
 
-            // Wait for 300ms animation duration before toggling visibility off 
-            // so layout doesn't hide it instantly mid-slide.
-            await Task.Delay(300);
+        _settingsOpen = false;
 
-            // Only hide it if the user didn't instantly try reopening it during the delay
-            if (!_settingsOpen)
-            {
-                SettingsPanel.IsVisible = false;
-            }
+        // Wait for 300ms animation duration before toggling visibility off 
+        // so layout doesn't hide it instantly mid-slide.
+        await Task.Delay(300);
+
+        // Only hide it if the user didn't instantly try reopening it during the delay
+        if (!_settingsOpen)
+        {
+            SettingsPanel.IsVisible = false;
         }
     }
 
@@ -613,4 +557,54 @@ public partial class ScriptureWindow : Window
         }
     }
 
+    private async void OnIntervalCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        // Prevent event recursion loop
+        if (_isUpdatingInterval) return;
+
+        if (sender is ToggleButton clickedButton)
+        {
+            // Prevent unchecking the currently active item (forces at least one selection)
+            if (clickedButton.IsChecked == false)
+            {
+                _isUpdatingInterval = true;
+                clickedButton.IsChecked = true;
+                _isUpdatingInterval = false;
+                return;
+            }
+
+            _isUpdatingInterval = true;
+            TurnOffOtherIntervals(clickedButton);
+
+            _isUpdatingInterval = false;
+
+            // Parse out the timing value from the Tag property
+            if (clickedButton.Tag is string tagValue && int.TryParse(tagValue, out int intervalIndex))
+            {
+                _intervalIndex = intervalIndex;
+                System.Diagnostics.Debug.WriteLine($"Interval changed to: {_intervals[_intervalIndex]} seconds");
+
+                // Update your slideshow playback timer interval here
+                if (_isRunning)
+                {
+                    _timerService?.Stop();
+                    _timerService?.Start(_intervals[_intervalIndex] * 1000, () => _ = RunSerialized(NextVerseAsync));
+                }
+
+                await UpdateInfoAsync();
+            }
+        }
+    }
+
+    private void TurnOffOtherIntervals(ToggleButton clickedButton)
+    {
+        // Turn off all other segment tabs
+        if (clickedButton != Btn5s) Btn5s.IsChecked = false;
+        if (clickedButton != Btn10s) Btn10s.IsChecked = false;
+        if (clickedButton != Btn20s) Btn20s.IsChecked = false;
+        if (clickedButton != Btn30s) Btn30s.IsChecked = false;
+        if (clickedButton != Btn60s) Btn60s.IsChecked = false;
+    }
+
+    
 }

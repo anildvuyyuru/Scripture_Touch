@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace ScriptureProjection.Interfaces
+namespace ScriptureFlow_Touch.Interfaces
 {
     public interface IScriptureService
     {

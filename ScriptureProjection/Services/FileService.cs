@@ -1,7 +1,7 @@
-﻿using ScriptureProjection.Interfaces;
+﻿using ScriptureFlow_Touch.Interfaces;
 using System.Text.Json;
 
-namespace ScriptureProjection.Services
+namespace ScriptureFlow_Touch.Services
 {
     public class FileService : IFileService
     {

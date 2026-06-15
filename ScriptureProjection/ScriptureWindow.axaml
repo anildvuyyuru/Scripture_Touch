@@ -1,6 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="ScriptureProjection.ScriptureWindow"
+        x:Class="ScriptureFlow_Touch.ScriptureWindow"
         Background="Black"
         CanResize="False"
         WindowState="Maximized"
@@ -33,6 +33,24 @@
 					</KeyFrame>
 				</Animation>
 			</Style.Animations>
+		</Style>
+
+		<Style Selector="ToggleButton.SegmentButton">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Foreground" Value="#B0FFFFFF"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="Padding" Value="0,8"/>
+			<Setter Property="CornerRadius" Value="9"/>
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+
+		<Style Selector="ToggleButton.SegmentButton:checked">
+			<Setter Property="Background" Value="#35FFFFFF"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
 		</Style>
 	</Window.Styles>
 
@@ -173,6 +191,62 @@
 
 						</StackPanel>
 					</StackPanel>
+
+					<Separator Background="#15FFFFFF" Height="1"/>
+
+					<StackPanel Margin="20" Spacing="25">
+						<TextBlock Text="Verse Interval"  
+								   Foreground="White"
+								   FontWeight="SemiBold"
+								   FontSize="24"
+								   Margin="0,0,0,10"/>
+
+						<Border Background="#10FFFFFF"
+								BorderBrush="#15FFFFFF"
+								BorderThickness="1"
+								CornerRadius="12"
+								Padding="3">
+
+							<UniformGrid Rows="1" Columns="5">
+
+								<ToggleButton x:Name="Btn5s"
+											  Content="5s"
+											  IsChecked="True"
+											  Tag="0"
+											  Classes="SegmentButton"											  
+											  IsCheckedChanged="OnIntervalCheckedChanged"/>
+
+								<ToggleButton x:Name="Btn10s"
+											  Content="10s"
+											  IsChecked="False" Tag="1"
+											  Classes="SegmentButton"
+											  IsCheckedChanged="OnIntervalCheckedChanged"/>
+
+								<ToggleButton x:Name="Btn20s"
+											  Content="20s"
+											  IsChecked="False"
+											  Tag="2"
+											  Classes="SegmentButton"
+											  IsCheckedChanged="OnIntervalCheckedChanged"/>
+
+								<ToggleButton x:Name="Btn30s"
+											  Content="30s"
+											  IsChecked="False"
+											  Tag="3"
+											  Classes="SegmentButton"
+											  IsCheckedChanged="OnIntervalCheckedChanged"/>
+
+								<ToggleButton x:Name="Btn60s"
+											  Content="60s"
+											  IsChecked="False"
+											  Tag="4"
+											  Classes="SegmentButton"
+											  IsCheckedChanged="OnIntervalCheckedChanged"/>
+
+							</UniformGrid>
+						</Border>
+					</StackPanel>
+										
 				</StackPanel>
 			</Panel>
 	<!-- End Settings Panel -->
@@ -218,7 +292,8 @@
 							VerticalAlignment="Center"
 							IsHitTestVisible="True">
 
-					<Button Tapped="OnPrevTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
+					<Button Tapped="OnPrevTapped" Background="Transparent" BorderThickness="0" Focusable="False" 
+							Padding="0" Width="64" Height="64" CornerRadius="32">
 						<Grid Width="64" Height="64">
 							<Path Data="M 4,0 L 10,0 L 10,48 L 4,48 Z M 10,24 L 30,0 L 30,48 Z M 30,24 L 50,0 L 50,48 Z"
 								  Fill="White" Stretch="Uniform" Margin="16"
@@ -226,7 +301,8 @@
 						</Grid>
 					</Button>
 
-					<Button Tapped="OnPlayPauseTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
+					<Button Tapped="OnPlayPauseTapped" Background="Transparent" BorderThickness="0" Focusable="False" 
+							Padding="0" Width="64" Height="64" CornerRadius="32">
 						<ContentControl x:Name="PlayPauseIcon">
 							<Grid Width="64" Height="64">
 								<Path Data="M 16,12 L 26,12 L 26,52 L 16,52 Z M 38,12 L 48,12 L 48,52 L 38,52 Z"
@@ -236,7 +312,8 @@
 						</ContentControl>
 					</Button>
 
-					<Button Tapped="OnNextTapped" Background="Transparent" BorderThickness="0" Focusable="False" Padding="0" Width="64" Height="64" CornerRadius="32">
+					<Button Tapped="OnNextTapped" Background="Transparent" BorderThickness="0" Focusable="False" 
+							Padding="0" Width="64" Height="64" CornerRadius="32">
 						<Grid Width="64" Height="64">
 							<Path Data="M 4,0 L 24,24 L 4,48 Z M 24,0 L 44,24 L 24,48 Z M 44,0 L 50,0 L 50,48 L 44,48 Z"
 								  Fill="White" Stretch="Uniform" Margin="16"

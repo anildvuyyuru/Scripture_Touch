@@ -1,7 +1,7 @@
-﻿using ScriptureProjection.Entities;
+﻿using ScriptureFlow_Touch.Entities;
 using System.Text.Json.Serialization;
 
-namespace ScriptureProjection
+namespace ScriptureFlow_Touch
 {
     [JsonSerializable(typeof(Scripture))]
     [JsonSerializable(typeof(List<Scripture>))]

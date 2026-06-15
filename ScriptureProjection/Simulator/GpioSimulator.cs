@@ -1,8 +1,8 @@
 ﻿using Avalonia.Threading;
-using ScriptureProjection.Interfaces;
+using ScriptureFlow_Touch.Interfaces;
 using System.Device.Gpio;
 
-namespace ScriptureProjection.Services
+namespace ScriptureFlow_Touch.Services
 {
     public class GpioServiceSimulator : IGpioSimulatorService
     {
