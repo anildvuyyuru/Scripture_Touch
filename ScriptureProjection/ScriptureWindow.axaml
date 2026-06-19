@@ -59,36 +59,42 @@
 
 		<Border Background="#70000000"/>
 
+		
+
 		<Grid ColumnDefinitions="*, Auto">
 
-			<Grid Grid.Column="0" Margin="94,94,40,94">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="*" />
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
+			<Panel Grid.Column="0" Margin="94,94,40,94" ClipToBounds="True">
 
-				<TextBlock Grid.Row="0"
-                           x:Name="VerseText"
-                           VerticalAlignment="Center"
-                           TextAlignment="Center"
-                           Margin="0,20,0,0"
-                           Foreground="White"
-                           FontWeight="SemiBold"
-                           TextWrapping="Wrap"
-                           TextTrimming="WordEllipsis"/>
+				<Grid RowDefinitions="*, Auto">
 
-				<StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
-					<TextBlock x:Name="RefBlock"
-                               Foreground="#E6E6E6"
-                               FontSize="28"
-                               TextAlignment="Right" />
-					<TextBlock x:Name="InfoLeft"
-                               Foreground="#C8C8C8"
-                               FontSize="24"
-                               HorizontalAlignment="Left"
-                               IsVisible="True" />
-				</StackPanel>
-			</Grid>
+					<Panel Grid.Row="0" ClipToBounds="True" VerticalAlignment="Center">
+						<TextBlock x:Name="VerseText"
+								   TextAlignment="Center"
+								   Margin="0,20,0,0"
+								   Foreground="White"
+								   FontWeight="SemiBold"
+								   TextWrapping="Wrap"
+								   TextTrimming="WordEllipsis">
+							<TextBlock.RenderTransform>
+								<TranslateTransform X="0" Y="0"/>
+							</TextBlock.RenderTransform>
+						</TextBlock>
+					</Panel>
+
+					<StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0">
+						<TextBlock x:Name="RefBlock"
+								   Foreground="#E6E6E6"
+								   FontSize="28"
+								   TextAlignment="Right" />
+
+						<TextBlock x:Name="InfoLeft"
+								   Foreground="#C8C8C8"
+								   FontSize="24"
+								   HorizontalAlignment="Left"
+								   IsVisible="True" />
+					</StackPanel>
+				</Grid>
+			</Panel>
 <!-- Settings Panel -->
 			<Panel Grid.Column="1"
 	   x:Name="SettingsPanel"

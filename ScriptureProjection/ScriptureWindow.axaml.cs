@@ -6,6 +6,7 @@ using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
@@ -30,13 +31,16 @@ public partial class ScriptureWindow : Window
     private bool _isUpdatingInterval = false;
 
     private bool _isRunning = true;
-    private string _group = "Promises";
+    private string _group = "Encouragement";
     private readonly int[] _intervals = [5, 10, 20, 30, 60]; // seconds
     private int _intervalIndex = 0;
     private int _verseIndex = 0;
 
     // serialize operations so timer + buttons don’t overlap
     private readonly SemaphoreSlim _opLock = new(1, 1);
+
+    // A master list to keep track of every single letter control currently on screen
+    private List<TextBlock> _activeLetters = new List<TextBlock>();
 
     public ScriptureWindow()
     {
@@ -175,15 +179,15 @@ public partial class ScriptureWindow : Window
             var verseData = await _scriptureService.LoadScripture();
             if (verseData == null)
             {
-                ShowError("verses.json not found next to the app.");
+                //ShowError("verses.json not found next to the app.");
                 return;
             }
-            _data = verseData;
+            _data = verseData;            
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            ShowError("Error loading verses.");
+            //ShowError("Error loading verses.");
         }
     }
 
@@ -231,7 +235,7 @@ public partial class ScriptureWindow : Window
     private void ShowError(string message)
     {
         RefBlock.Text = "";
-        VerseText.Text = message;
+        //VerseText.Text = message;
         InfoLeft.Text = "Error";
     }
 
@@ -282,8 +286,10 @@ public partial class ScriptureWindow : Window
             var verse = await _scriptureService.GetVerse(_group, _verseIndex);
             if (verse != null)
             {
-                SetFont(verse.Text);
-                RefBlock.Text = await _scriptureService.GetReferenceInfo(_data, verse);
+                await UpdateVerseWithTransitionAsync(verse.Text, await _scriptureService.GetReferenceInfo(_data, verse));
+                //SetFont(verse.Text);
+                
+                //RefBlock.Text = await _scriptureService.GetReferenceInfo(_data, verse);
                 await UpdateInfoAsync();
             }
         }
@@ -315,64 +321,30 @@ public partial class ScriptureWindow : Window
 
     private void SetFont(string verseText)
     {
-        if (string.IsNullOrWhiteSpace(verseText))
-            return;
+        var verseTextCtrl = this.FindControl<TextBlock>("VerseText");
+        if (verseTextCtrl == null || string.IsNullOrWhiteSpace(verseText)) return;
 
         bool startsWithQuote = verseText.StartsWith("\"");
-
-        string verseInitial = startsWithQuote
-            ? verseText.Substring(0, 2)
-            : verseText.Substring(0, 1);
-
-        string verseRest = startsWithQuote
-            ? verseText.Substring(2)
-            : verseText.Substring(1);
-
+        string verseInitial = startsWithQuote ? verseText.Substring(0, 2) : verseText.Substring(0, 1);
+        string verseRest = startsWithQuote ? verseText.Substring(2) : verseText.Substring(1);
         bool isEscapedInitial = verseInitial.Contains("\"");
 
         int verseLength = verseText.Length;
-        int verseFontSize =
-            verseLength >= 400 ? 90 :
-            verseLength <= 100 ? 120 :
-            75;
+        int verseFontSize = verseLength >= 400 ? 90 : verseLength <= 100 ? 120 : 75;
 
-        VerseText.Inlines?.Clear();
+        verseTextCtrl.Inlines?.Clear();
 
         if (isEscapedInitial)
         {
-            VerseText.Inlines?.Add(new Run
-            {
-                Text = verseInitial[0].ToString(),
-                FontFamily = new FontFamily("Pirata One"),
-                FontSize = 150
-            });
-
-            VerseText.Inlines?.Add(new Run
-            {
-                Text = verseInitial[1].ToString(),
-                FontFamily = new FontFamily("Pirata One"),
-                FontSize = 150,
-                Foreground = Brushes.DarkGoldenrod
-            });
+            verseTextCtrl.Inlines?.Add(new Avalonia.Controls.Documents.Run { Text = verseInitial[0].ToString(), FontFamily = new FontFamily("Pirata One"), FontSize = 150 });
+            verseTextCtrl.Inlines?.Add(new Avalonia.Controls.Documents.Run { Text = verseInitial[1].ToString(), FontFamily = new FontFamily("Pirata One"), FontSize = 150, Foreground = Brushes.DarkGoldenrod });
         }
         else
         {
-            VerseText.Inlines?.Add(new Run
-            {
-                Text = verseInitial,
-                FontFamily = new FontFamily("Pirata One"),
-                FontSize = 150,
-                Foreground = Brushes.DarkGoldenrod
-            });
+            verseTextCtrl.Inlines?.Add(new Avalonia.Controls.Documents.Run { Text = verseInitial, FontFamily = new FontFamily("Pirata One"), FontSize = 150, Foreground = Brushes.DarkGoldenrod });
         }
 
-        VerseText.Inlines?.Add(new Run
-        {
-            Text = verseRest,
-            FontFamily = new FontFamily("Pirata One"),
-            FontSize = verseFontSize,
-            Foreground = Brushes.White
-        });
+        verseTextCtrl.Inlines?.Add(new Avalonia.Controls.Documents.Run { Text = verseRest, FontFamily = new FontFamily("Pirata One"), FontSize = verseFontSize, Foreground = Brushes.White });
     }
 
     private void StartTimer()
@@ -606,5 +578,45 @@ public partial class ScriptureWindow : Window
         if (clickedButton != Btn60s) Btn60s.IsChecked = false;
     }
 
+    private async Task UpdateVerseWithTransitionAsync(string newVerse, string newReference)
+    {
+        // Manually look up VerseText to bypass any auto-generation compiler bugs
+        var verseText = this.FindControl<TextBlock>("VerseText");
+        var transform = verseText?.RenderTransform as TranslateTransform;
+
+        if (transform != null)
+        {
+            // 1. Erase (Right to Left): Slide the verse left out of the window frame
+            for (double x = 0; x >= -1200; x -= 60)
+            {
+                transform.X = x;
+                await Task.Delay(10);
+            }
+        }
+
+        // 2. Safe Zone: Update text properties while completely hidden off-screen
+        if (RefBlock != null) RefBlock.Text = newReference;
+
+        // Calls your original SetFont(string) method cleanly!
+        SetFont(newVerse);
+
+        if (transform != null)
+        {
+            // Teleport the text to the right side invisibly
+            transform.X = 1200;
+
+            // 3. Reveal (Left to Right): Slide the new verse back into the center from the right
+            for (double x = 1200; x >= 0; x -= 50)
+            {
+                transform.X = x;
+                await Task.Delay(12);
+            }
+
+            // Snap perfectly to center layout alignment
+            transform.X = 0;
+        }
+    }
+
     
+
 }
