@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ScriptureFlow_Touch.ScriptureWindow"
+		xmlns:local="clr-namespace:ScriptureFlow_Touch.Entities"
         Background="Black"
         CanResize="False"
         WindowState="Maximized"
@@ -150,13 +151,11 @@
 										   VerticalAlignment="Center" />
 								<ToggleSwitch Grid.Column="1"
 											  x:Name="Promises"
-											  IsChecked="True"
+											  IsChecked="False"
 											  OnContent=""
 											  OffContent=""
 											  IsCheckedChanged="OnCategoryCheckedChanged"/>
 							</Grid>
-
-							<Separator Background="#15FFFFFF" Height="1"/>
 
 							<Grid ColumnDefinitions="*, Auto">
 								<TextBlock Grid.Column="0" Text="Proverbs" Foreground="White" FontSize="20" FontWeight="Medium" 
@@ -169,8 +168,6 @@
 											  IsCheckedChanged="OnCategoryCheckedChanged"/>
 							</Grid>
 
-							<Separator Background="#15FFFFFF" Height="1"/>
-
 							<Grid ColumnDefinitions="*, Auto">
 								<TextBlock Grid.Column="0" Text="Psalms" Foreground="White" FontSize="20" FontWeight="Medium" 
 										   VerticalAlignment="Center" />
@@ -182,14 +179,12 @@
 											  IsCheckedChanged="OnCategoryCheckedChanged"/>
 							</Grid>
 
-							<Separator Background="#15FFFFFF" Height="1"/>
-
 							<Grid ColumnDefinitions="*, Auto">
 								<TextBlock Grid.Column="0" Text="Encouragement" Foreground="White" FontSize="20" FontWeight="Medium" 
 										   VerticalAlignment="Center" />
 								<ToggleSwitch Grid.Column="1"
 											  x:Name="Encouragement"
-											  IsChecked="False"
+											  IsChecked="True"
 											  OnContent=""
 											  OffContent=""
 											  IsCheckedChanged="OnCategoryCheckedChanged"/>
@@ -251,6 +246,62 @@
 
 							</UniformGrid>
 						</Border>
+					</StackPanel>
+
+					<Separator Background="#15FFFFFF" Height="1"/>
+
+					<StackPanel Margin="20" Spacing="25">
+						<TextBlock Text="Verse Background"
+								   FontSize="24"
+								   FontWeight="SemiBold"
+								   Foreground="White"
+								   Margin="0,0,0,10"/>
+
+						<ListBox x:Name="BackgroundSelector"
+							 Background="Transparent"
+							 MaxHeight="220"
+							 ScrollViewer.VerticalScrollBarVisibility="Auto"
+							 SelectionChanged="BackgroundSelector_SelectionChanged">
+
+							<ListBox.ItemsPanel>
+								<ItemsPanelTemplate>
+									<UniformGrid Columns="2" HorizontalAlignment="Stretch"/>
+								</ItemsPanelTemplate>
+							</ListBox.ItemsPanel>
+
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<Border BorderBrush="Gray"
+											BorderThickness="1"
+											CornerRadius="6"
+											ClipToBounds="True"
+											Height="100"
+											Margin="5"
+											Background="{Binding ThumbnailColor}">
+										<Grid>
+											<Image Source="{Binding ThumbnailImage, Mode=OneWay}" Stretch="UniformToFill"/>
+											<Border Background="#A0000000" VerticalAlignment="Bottom" Height="28">
+												<TextBlock Text="{Binding DisplayName}"
+														   Foreground="White"
+														   FontSize="12"
+														   HorizontalAlignment="Center"
+														   VerticalAlignment="Center"/>
+											</Border>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+
+							<local:VerseBackground DisplayName="Encouragement" ThumbnailPath="avares://ScriptureFlow_Touch/Backgrounds/Encouragement/Encouragement.png"/>
+							<local:VerseBackground DisplayName="Promises" ThumbnailPath="avares://ScriptureFlow_Touch/Backgrounds/Promises/Promises.jpg"/>
+							<local:VerseBackground DisplayName="Proverbs" ThumbnailPath="avares://ScriptureFlow_Touch/Backgrounds/Proverbs/Proverbs.png"/>
+							<local:VerseBackground DisplayName="Psalms" ThumbnailPath="avares://ScriptureFlow_Touch/Backgrounds/Psalms/Psalms.png"/>
+
+							<local:VerseBackground DisplayName="Midnight Charcoal" SolidColor="#1E1E24"/>
+							<local:VerseBackground DisplayName="Deep Burgundy" SolidColor="#3D0C11"/>
+							<local:VerseBackground DisplayName="Sacred Navy" SolidColor="#111D33"/>
+							<local:VerseBackground DisplayName="Forest Sanctuary" SolidColor="#1B2D2A"/>
+						</ListBox>
 					</StackPanel>
 										
 				</StackPanel>

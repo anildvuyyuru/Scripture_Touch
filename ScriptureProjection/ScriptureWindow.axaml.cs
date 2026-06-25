@@ -9,11 +9,13 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ScriptureFlow_Touch.Entities;
 using ScriptureFlow_Touch.Interfaces;
+using System.Text;
 
 namespace ScriptureFlow_Touch;
 
@@ -38,9 +40,6 @@ public partial class ScriptureWindow : Window
 
     // serialize operations so timer + buttons don’t overlap
     private readonly SemaphoreSlim _opLock = new(1, 1);
-
-    // A master list to keep track of every single letter control currently on screen
-    private List<TextBlock> _activeLetters = new List<TextBlock>();
 
     public ScriptureWindow()
     {
@@ -232,13 +231,6 @@ public partial class ScriptureWindow : Window
         Background = Brushes.Black;
     }
 
-    private void ShowError(string message)
-    {
-        RefBlock.Text = "";
-        //VerseText.Text = message;
-        InfoLeft.Text = "Error";
-    }
-
     private async Task SetGroupAsync(string? g)
     {
         if (string.IsNullOrWhiteSpace(g) || !_data.Groups.ContainsKey(g))
@@ -287,9 +279,6 @@ public partial class ScriptureWindow : Window
             if (verse != null)
             {
                 await UpdateVerseWithTransitionAsync(verse.Text, await _scriptureService.GetReferenceInfo(_data, verse));
-                //SetFont(verse.Text);
-                
-                //RefBlock.Text = await _scriptureService.GetReferenceInfo(_data, verse);
                 await UpdateInfoAsync();
             }
         }
@@ -306,17 +295,28 @@ public partial class ScriptureWindow : Window
 
         try
         {
-            var verse = await _scriptureService.GetVerse(_group, _verseIndex);
-            if (verse != null)
-            {
-                var background = await _scriptureService.GetBackgroundPath(verse, _group, _data);
-                await SetBackgroundAsync(background);
-            }
+
+            //Get Background
+            var background = await GetBackground();
+            await SetBackgroundAsync(background);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
         }
+    }
+
+    private async Task<string?> GetBackground()
+    {
+        if (_scriptureService == null)
+            return await Task.FromResult(string.Empty);
+
+        var verse = await _scriptureService.GetVerse(_group, _verseIndex);
+        if (verse != null)
+        {
+            return await _scriptureService.GetBackgroundPath(verse, _group, _data);            
+        }
+        return await Task.FromResult(string.Empty);
     }
 
     private void SetFont(string verseText)
@@ -617,6 +617,42 @@ public partial class ScriptureWindow : Window
         }
     }
 
-    
+    public void BackgroundSelector_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ListBox listBox && listBox.SelectedItem is VerseBackground selectedItem)
+        {
+            var backgroundDisplay = this.FindControl<Image>("BgImage");
+            if (backgroundDisplay == null) return;
+
+            try
+            {
+                // Scenario A: Image Background Selected
+                if (!string.IsNullOrEmpty(selectedItem.ThumbnailPath))
+                {
+                    var assetUri = new Uri(selectedItem.ThumbnailPath);
+                    backgroundDisplay.Source = new Bitmap(AssetLoader.Open(assetUri));
+
+                    // Clear any parent panel tints if you're layering elements
+                    if (backgroundDisplay.Parent is Panel parentPanel) parentPanel.Background = Brushes.Transparent;
+                }
+                // Scenario B: Solid Color Selected
+                else if (!string.IsNullOrEmpty(selectedItem.SolidColor))
+                {
+                    // Unset the image source so the panel background color can be seen
+                    backgroundDisplay.Source = null;
+
+                    // Apply the color directly to the image container's parent Panel background layout frame
+                    if (backgroundDisplay.Parent is Panel parentPanel)
+                    {
+                        parentPanel.Background = selectedItem.ThumbnailColor;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to swap background: {ex.Message}");
+            }
+        }
+    }
 
 }

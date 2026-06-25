@@ -47,23 +47,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Backgrounds\Encouragement\Encouragement.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Backgrounds\Promises\Promises.jpg">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Backgrounds\Proverbs\Proverbs.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Backgrounds\Psalms\Psalms.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	  <None Update="Scripture.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>	
 	</ItemGroup>
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Backgrounds\Encouragement\Encouragement.png" />
+	  <None Remove="Backgrounds\Promises\Promises.jpg" />
+	  <None Remove="Backgrounds\Proverbs\Proverbs.png" />
+	  <None Remove="Backgrounds\Psalms\Psalms.png" />
+	</ItemGroup>
+	<ItemGroup>
+	  <AvaloniaXaml Include="Backgrounds\Encouragement\Encouragement.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </AvaloniaXaml>
+	  <AvaloniaXaml Include="Backgrounds\Promises\Promises.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </AvaloniaXaml>
+	  <AvaloniaXaml Include="Backgrounds\Proverbs\Proverbs.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </AvaloniaXaml>
+	  <AvaloniaXaml Include="Backgrounds\Psalms\Psalms.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </AvaloniaXaml>
 	</ItemGroup>
 </Project>
